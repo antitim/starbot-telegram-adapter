@@ -2,35 +2,29 @@
 
 const axios = require('axios');
 
-module.exports = class TelegramAdapter {
+module.exports = function (settings, botControl) {
+  let { token } = settings || {};
 
-  constructor (options, botControl) {
-    let self = this;
+  return async (req, res) => {
+    res.end();
 
-    self.token = options.token;
-    self.botControl = botControl;
+    let body = req.body;
 
-    self.receiver = async function (req, res) {
-      res.end();
+    if (body.message.text !== '/start') {
+      let userId = 'telegram_' + body.message.from.id;
+      let text = body.message.text;
 
-      let body = req.body;
+      let answer = await botControl(userId, text);
 
-      if (body.message.text !== '/start') {
-        let userId = 'telegram_' + body.message.from.id;
-        let text = body.message.text;
+      userId = answer.userId.split('telegram_')[1];
+      text = answer.text;
 
-        let answer = await self.botControl(userId, text);
-
-        userId = answer.userId.split('telegram_')[1];
-        text = answer.text;
-
-        await axios.get('https://api.telegram.org/bot' + self.token + '/sendMessage', {
-          params: {
-            chat_id: userId,
-            text: text
-          }
-        });
-      }
-    };
-  }
+      await axios.get('https://api.telegram.org/bot' + token + '/sendMessage', {
+        params: {
+          chat_id: userId,
+          text: text
+        }
+      });
+    }
+  };
 };

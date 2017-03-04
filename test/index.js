@@ -11,8 +11,8 @@ describe('Telegram Adapter', () => {
     message: 'Кто там?'
   });
 
-  let telegram = new Adapter({
-    token: 'fakeToken',
+  let telegram = Adapter({
+    token: 'fakeToken'
   }, bot);
 
   it('message_new', async () => {
@@ -26,7 +26,7 @@ describe('Telegram Adapter', () => {
       });
     });
 
-    await telegram.receiver({body: {
+    await telegram({body: {
       message: {
         text: 'Привет',
         from: {

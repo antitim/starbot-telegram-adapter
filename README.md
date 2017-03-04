@@ -1,6 +1,29 @@
 # starbot-telegram-adapter [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
-## Лицензия
+## About
+
+Telegram adapter for [StarBot](https://github.com/antitim/starbot)
+
+## Installation
+
+```sh
+$ npm install --save starbot-telegram-adapter
+```
+
+## Options
+
+```js
+const bot = Starbot({
+  ...
+  adapter: {
+    type: 'starbot-telegram-adapter',
+    token: 'token'
+  }
+  ...
+});
+```
+
+## License
 
 MIT © [antitim](http://vk.com/antitim)
 
