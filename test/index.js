@@ -5,6 +5,7 @@ const sinon = require('sinon');
 const botControl = require('starbot-ktotam-bot');
 const Adapter = require('..');
 const axios = require('axios');
+const querystring = require('querystring');
 
 describe('Telegram Adapter', () => {
   let bot = botControl({
@@ -16,13 +17,15 @@ describe('Telegram Adapter', () => {
   }, bot);
 
   it('message_new', async () => {
-    let stub = sinon.stub(axios, 'get', function (url, params) {
-      url.should.equal('https://api.telegram.org/botfakeToken/sendMessage');
+    let stub = sinon.stub(axios, 'request', function (params) {
       params.should.deep.equal({
-        params: {
+        url: 'https://api.telegram.org/botfakeToken/sendMessage',
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        data: querystring.stringify({
           chat_id: 'fakeUserId',
           text: 'Кто там?'
-        }
+        })
       });
     });
 

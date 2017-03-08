@@ -1,6 +1,7 @@
 'use strict';
 
 const axios = require('axios');
+const querystring = require('querystring');
 
 module.exports = function (settings, botControl) {
   let { token } = settings || {};
@@ -19,11 +20,14 @@ module.exports = function (settings, botControl) {
       userId = answer.userId.split('telegram_')[1];
       text = answer.text;
 
-      await axios.get('https://api.telegram.org/bot' + token + '/sendMessage', {
-        params: {
+      await axios.request({
+        url: 'https://api.telegram.org/bot' + token + '/sendMessage',
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        data: querystring.stringify({
           chat_id: userId,
           text: text
-        }
+        })
       });
     }
   };
