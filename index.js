@@ -1,34 +1,51 @@
-'use strict';
-
 const axios = require('axios');
 const querystring = require('querystring');
 
-module.exports = function (settings, botControl) {
-  let { token } = settings || {};
+class Adapter {
+  constructor (settings) {
+    if (!settings.token) throw new Error('Not specified token in settings');
 
-  return async (req, res) => {
-    res.end();
+    this.token = settings.token;
+  }
 
-    let body = req.body;
+  set bot (bot) {
+    this.message = bot.message.bind(bot);
 
-    if (body.message.text !== '/start') {
-      let userId = 'telegram_' + body.message.from.id;
-      let text = body.message.text;
-
-      let answer = await botControl(userId, text);
-
-      userId = answer.userId.split('telegram_')[1];
-      text = answer.text;
-
-      await axios.request({
-        url: 'https://api.telegram.org/bot' + token + '/sendMessage',
+    bot.on('message', (message) => {
+      axios.request({
+        url: 'https://api.telegram.org/bot' + this.token + '/sendMessage',
         method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         data: querystring.stringify({
-          chat_id: userId,
-          text: text
+          chat_id: message.client.split('telegram-')[1],
+          text: message.text
         })
       });
+    });
+  }
+
+  async middleware (req, res, next) {
+    try {
+      const {
+        body: {
+          message
+        }
+      } = req;
+
+      if (message.text !== '/start') {
+        await this.message({
+          client: `telegram-${message.from.id}`,
+          text: message.text
+        });
+      }
+
+      res.end();
+    } catch (err) {
+      next(err);
     }
-  };
-};
+  }
+}
+
+module.exports = Adapter;
