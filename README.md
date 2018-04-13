@@ -13,13 +13,10 @@ $ npm install --save starbot-telegram-adapter
 ## Options
 
 ```js
-const bot = Starbot({
-  ...
-  adapter: {
-    type: 'starbot-telegram-adapter',
-    token: 'token'
-  }
-  ...
+const AdapterTelegram = require('starbot-telegram-adapter');
+
+const adapter = new AdapterTelegram({
+  token: 'token',
 });
 ```
 

@@ -1,20 +1,20 @@
-'use strict';
-
 require('chai').should();
 const sinon = require('sinon');
-const botControl = require('starbot-ktotam-bot');
+const Bot = require('starbot-ktotam-bot');
 const Adapter = require('..');
 const axios = require('axios');
 const querystring = require('querystring');
 
 describe('Telegram Adapter', () => {
-  let bot = botControl({
+  let bot = new Bot({
     message: 'Кто там?'
   });
 
-  let telegram = Adapter({
+  let adapter = new Adapter({
     token: 'fakeToken'
-  }, bot);
+  });
+
+  adapter.bot = bot;
 
   it('message_new', async () => {
     let stub = sinon.stub(axios, 'request', function (params) {
@@ -29,7 +29,7 @@ describe('Telegram Adapter', () => {
       });
     });
 
-    await telegram({body: {
+    await adapter.middleware({ body: {
       message: {
         text: 'Привет',
         from: {
@@ -37,8 +37,10 @@ describe('Telegram Adapter', () => {
         }
       }
     }}, {
-      send: () => {},
-      end: () => {}
+      send: function () {},
+      end: function () {}
+    }, (err) => {
+      err.should.be.null();
     });
 
     stub.restore();
